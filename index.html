@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tic-Tac-Toe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="scripts.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container mx-auto text-center text-white">
+      <h1 class="text-4xl md:text-5xl font-bold mb-6 drop-shadow-lg">
+        Tic-Tac-Toe
+      </h1>
+      <div class="mb-4">
+        <button
+          id="twoPlayerBtn"
+          class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg mr-2 transition duration-300"
+        >
+          Two Players
+        </button>
+        <button
+          id="aiBtn"
+          class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300"
+        >
+          Play vs AI
+        </button>
+      </div>
+      <div id="gameBoard" class="grid grid-cols-3 gap-2 w-80 md:w-96 mx-auto">
+        <div
+          class="cell bg-gray-800 bg-opacity-50 rounded-lg h-24 md:h-32 flex items-center justify-center text-4xl md:text-5xl font-bold cursor-pointer"
+          data-index="0"
+        ></div>
+        <div
+          class="cell bg-gray-800 bg-opacity-50 rounded-lg h-24 md:h-32 flex items-center justify-center text-4xl md:text-5xl font-bold cursor-pointer"
+          data-index="1"
+        ></div>
+        <div
+          class="cell bg-gray-800 bg-opacity-50 rounded-lg h-24 md:h-32 flex items-center justify-center text-4xl md:text-5xl font-bold cursor-pointer"
+          data-index="2"
+        ></div>
+        <div
+          class="cell bg-gray-800 bg-opacity-50 rounded-lg h-24 md:h-32 flex items-center justify-center text-4xl md:text-5xl font-bold cursor-pointer"
+          data-index="3"
+        ></div>
+        <div
+          class="cell bg-gray-800 bg-opacity-50 rounded-lg h-24 md:h-32 flex items-center justify-center text-4xl md:text-5xl font-bold cursor-pointer"
+          data-index="4"
+        ></div>
+        <div
+          class="cell bg-gray-800 bg-opacity-50 rounded-lg h-24 md:h-32 flex items-center justify-center text-4xl md:text-5xl font-bold cursor-pointer"
+          data-index="5"
+        ></div>
+        <div
+          class="cell bg-gray-800 bg-opacity-50 rounded-lg h-24 md:h-32 flex items-center justify-center text-4xl md:text-5xl font-bold cursor-pointer"
+          data-index="6"
+        ></div>
+        <div
+          class="cell bg-gray-800 bg-opacity-50 rounded-lg h-24 md:h-32 flex items-center justify-center text-4xl md:text-5xl font-bold cursor-pointer"
+          data-index="7"
+        ></div>
+        <div
+          class="cell bg-gray-800 bg-opacity-50 rounded-lg h-24 md:h-32 flex items-center justify-center text-4xl md:text-5xl font-bold cursor-pointer"
+          data-index="8"
+        ></div>
+      </div>
+      <p id="status" class="mt-6 text-xl md:text-2xl font-semibold">
+        Player X's Turn
+      </p>
+      <button
+        id="restartBtn"
+        class="mt-4 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300"
+      >
+        Restart Game
+      </button>
+      <footer class="footer mt-8 text-lg md:text-xl text-gray-200">
+        Made by Ashish Kanan with ❤️
+      </footer>
+      <div
+        id="modal"
+        class="fixed inset-0 flex items-center justify-center hidden modal"
+      >
+        <div class="bg-white text-black p-6 rounded-lg shadow-lg text-center">
+          <h2 id="modalMessage" class="text-2xl font-bold mb-4"></h2>
+          <button
+            id="modalClose"
+            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const cells = document.querySelectorAll(".cell");
+      const status = document.getElementById("status");
+      const restartBtn = document.getElementById("restartBtn");
+      const twoPlayerBtn = document.getElementById("twoPlayerBtn");
+      const aiBtn = document.getElementById("aiBtn");
+      const modal = document.getElementById("modal");
+      const modalMessage = document.getElementById("modalMessage");
+      const modalClose = document.getElementById("modalClose");
+      let board = ["", "", "", "", "", "", "", "", ""];
+      let currentPlayer = "X";
+      let gameActive = true;
+      let isAI = false;
+
+      const winCombinations = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8], // Rows
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8], // Columns
+        [0, 4, 8],
+        [2, 4, 6], // Diagonals
+      ];
+
+      function handleCellClick(e) {
+        const index = e.target.dataset.index;
+        if (board[index] === "" && gameActive) {
+          board[index] = currentPlayer;
+          e.target.textContent = currentPlayer;
+          e.target.classList.add(
+            currentPlayer === "X" ? "text-blue-300" : "text-red-300"
+          );
+          checkGameStatus();
+          if (gameActive && isAI && currentPlayer === "O") {
+            setTimeout(makeAIMove, 500);
+          }
+        }
+      }
+
+      function checkGameStatus() {
+        let winner = null;
+        for (const combination of winCombinations) {
+          const [a, b, c] = combination;
+          if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+            winner = board[a];
+            cells[a].classList.add("win");
+            cells[b].classList.add("win");
+            cells[c].classList.add("win");
+            break;
+          }
+        }
+
+        if (winner) {
+          gameActive = false;
+          showModal(`Player ${winner} Wins!`);
+          status.textContent = `Player ${winner} Wins!`;
+        } else if (!board.includes("")) {
+          gameActive = false;
+          showModal("It's a Tie!");
+          status.textContent = "It's a Tie!";
+        } else {
+          currentPlayer = currentPlayer === "X" ? "O" : "X";
+          status.textContent = `Player ${currentPlayer}'s Turn`;
+        }
+      }
+
+      function makeAIMove() {
+        // Try to win
+        for (const combination of winCombinations) {
+          const [a, b, c] = combination;
+          if (board[a] === "O" && board[b] === "O" && board[c] === "")
+            return makeMove(c);
+          if (board[a] === "O" && board[c] === "O" && board[b] === "")
+            return makeMove(b);
+          if (board[b] === "O" && board[c] === "O" && board[a] === "")
+            return makeMove(a);
+        }
+        // Block player from winning
+        for (const combination of winCombinations) {
+          const [a, b, c] = combination;
+          if (board[a] === "X" && board[b] === "X" && board[c] === "")
+            return makeMove(c);
+          if (board[a] === "X" && board[c] === "X" && board[b] === "")
+            return makeMove(b);
+          if (board[b] === "X" && board[c] === "X" && board[a] === "")
+            return makeMove(a);
+        }
+        // Take center if available
+        if (board[4] === "") return makeMove(4);
+        // Take random available cell
+        const available = board
+          .map((val, idx) => (val === "" ? idx : null))
+          .filter((val) => val !== null);
+        if (available.length > 0) {
+          const randomIndex =
+            available[Math.floor(Math.random() * available.length)];
+          makeMove(randomIndex);
+        }
+      }
+
+      function makeMove(index) {
+        board[index] = "O";
+        cells[index].textContent = "O";
+        cells[index].classList.add("text-red-300");
+        checkGameStatus();
+      }
+
+      function showModal(message) {
+        modalMessage.textContent = message;
+        modal.classList.remove("hidden");
+      }
+
+      function restartGame() {
+        board = ["", "", "", "", "", "", "", "", ""];
+        currentPlayer = "X";
+        gameActive = true;
+        status.textContent = `Player ${currentPlayer}'s Turn`;
+        cells.forEach((cell) => {
+          cell.textContent = "";
+          cell.classList.remove("text-blue-300", "text-red-300", "win");
+        });
+        modal.classList.add("hidden");
+      }
+
+      function startTwoPlayer() {
+        isAI = false;
+        restartGame();
+        status.textContent = `Player ${currentPlayer}'s Turn`;
+      }
+
+      function startAIGame() {
+        isAI = true;
+        restartGame();
+        status.textContent = `Player ${currentPlayer}'s Turn`;
+      }
+
+      cells.forEach((cell) => cell.addEventListener("click", handleCellClick));
+      restartBtn.addEventListener("click", restartGame);
+      twoPlayerBtn.addEventListener("click", startTwoPlayer);
+      aiBtn.addEventListener("click", startAIGame);
+      modalClose.addEventListener("click", restartGame);
+    </script>
+  </body>
+</html>

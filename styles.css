@@ -1,0 +1,36 @@
+body {
+  background: linear-gradient(135deg, #1e3a8a, #7c3aed);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Arial", sans-serif;
+}
+.cell {
+  transition: all 0.3s ease;
+}
+.cell:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: scale(1.05);
+}
+.win {
+  animation: glow 1s ease-in-out infinite alternate;
+}
+@keyframes glow {
+  from {
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  }
+  to {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 1);
+  }
+}
+.modal {
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+}
+.footer {
+  transition: all 0.3s ease;
+}
+.footer:hover {
+  transform: translateY(-2px);
+}
